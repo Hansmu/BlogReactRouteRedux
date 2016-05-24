@@ -1,10 +1,25 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { reduxForm } from 'redux-form'; //Almost identical to connect
 import { Link } from 'react-router';
 
 import { createPost } from '../actions/index';
 
 class PostsNew extends Component {
+    static contextTypes = { //We had to define a context type to get access to the router.
+        router: PropTypes.object
+    };
+
+    onSubmit(props) { //When we call an action that creates a promise as a payload
+        this.props.createPost(props) //This call will return the same promise
+            .then(() => { //When that promise is resolved, it means our blog post was successfully created.
+                //Blog post has been created, navigate the user to the index
+                //We navigate by calling this.context.router.push ith the
+                //new path to navigate to.
+                this.context.router.push('/'); //We need access to react router to navigate around programmatically.
+                //React router is available to all of the components through the context property.
+             });
+    }
+
     render() {
         /*
         const handleSubmit  = this.props.handleSubmit; //Helper method provided by redux-form
@@ -21,7 +36,7 @@ class PostsNew extends Component {
         //redux provides us a helper called touched. It's false until
         //the user somehow interacts with the field. Then it doesn't show the error by default.
         return(
-            <form onSubmit={handleSubmit(this.props.createPost)}>
+            <form onSubmit={handleSubmit(this.onSubmit.bind(this))}>
                 <h3>Create a new post</h3>
                 <div className={`form-group ${title.touched && title.invalid ? 'has-danger' : ''}`}>
                     <label>Title</label>
